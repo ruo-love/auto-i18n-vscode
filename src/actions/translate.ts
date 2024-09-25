@@ -57,21 +57,21 @@ export class Translate {
   };
 
   public static Lang: { [key: string]: string } = {
-    "zh-CHS": "中文",
-    ja: "日文",
-    EN: "英文",
-    ko: "韩文",
-    fr: "法文",
-    ru: "俄文",
-    pt: "葡萄牙文",
-    es: "西班牙文",
-    vi: "越南文",
-  };
+    "中文": "zh-CHS",
+    "日文": "ja",
+    "英文": "EN",
+    "韩文": "ko",
+    "法文": "fr",
+    "俄文": "ru",
+    "葡萄牙文": "pt",
+    "西班牙文": "es",
+    "越南文": "vi"
+};
 
   public static ReqData = {
     q: "Hello World!",
-    from: Translate.Lang.EN,
-    to: Translate.Lang["zh-CHS"],
+    from: Translate.Lang["中文"],
+    to: Translate.Lang.英文,
     appKey: "",
     salt: "",
     sign: "",
@@ -97,11 +97,12 @@ export class Translate {
     return a;
   }
 
-  postYouDao(q: string):any {
+  postYouDao(q: string, to:string):any {
     return new Promise((resolve,reject)=>{
       Translate.ReqData.q = TextFilter.filter(q);
       Translate.ReqData.salt = this.guid();
       Translate.ReqData.appKey = this.appKey;
+      Translate.ReqData.to = Translate.Lang[to];
       this.sign(Translate.ReqData, this.appSecret);
       let reqUrl = Translate.API_URL + querystring.stringify(Translate.ReqData);
       http
@@ -148,7 +149,7 @@ export class Translate {
               } else {
                 const inputText = Translate.ReqData.q;
                 const outputText = parsedData.translation[0];
-                resolve({inputText,outputText})
+                resolve({inputText,outputText});
               }
             } catch (e:any) {
               reject(e);
@@ -163,18 +164,19 @@ export class Translate {
   }
   /**调用有道翻译 */
   async translate() {
-    let editor = vscode.window.activeTextEditor;
+    const editor = vscode.window.activeTextEditor;
     if (!editor) {
       return;
     }
-    let settings = vscode.workspace.getConfiguration();
-    this.appSecret = settings.get("translate.youdao.appSecret", "");
-    this.appKey = settings.get("translate.youdao.appKey", "");
+    const settings = vscode.workspace.getConfiguration();
+    this.appSecret = settings.get("translate.appSecret", "");
+    this.appKey = settings.get("translate.appKey", "");
+    const to = settings.get("translate.toLang",'英文');
     if (this.appSecret && this.appKey) {
       const content = this.getCentent();
       if (content) {
         try{
-          const {inputText,outputText} =await this.postYouDao(content);
+          const {inputText,outputText} =await this.postYouDao(content,to);
           this.onSuccess(inputText,outputText);
         }catch(err){
           this.onFail(err);
@@ -211,7 +213,7 @@ export class Translate {
     .writeText(outputText)
     .then(() => {
       vscode.window.showInformationMessage(
-        "The translation is complete and the content has entered the clipboard"
+        "Translation success"
       );
     });
   this.out.clear();

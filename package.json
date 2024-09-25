@@ -2,20 +2,26 @@
   "name": "i18n-auto",
   "displayName": "i18n-auto",
   "description": "",
-  "version": "0.0.1",
+  "author": "ruo-love",
+  "publisher": "ruo-love",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.93.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "icon.png",
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "vsce": {
+    "out": "vsix-out"
+  },
   "contributes": {
     "commands": [
       {
         "command": "i18n-auto.translate",
-        "title": "Hello World1"
+        "title": "i18n-auto"
       }
     ],
     "keybindings":{
@@ -25,30 +31,36 @@
     "menus": {
         "editor/context": [
             {
-                "command": "extension.translate",
-                "when": "editorTextFocus",
-                "group": "i18n-auto"
+                "command": "i18n-auto.translate",
+                "when": "editorTextFocus"
             }
         ]
     },
+    "icon": "icon.png",
     "configuration": {
       "type": "object",
       "title": "translate configuration",
       "properties": {
+        "translate.toLang": {
+          "type": "string",
+          "enum": ["中文", "日文", "英文", "韩文", "法文", "俄文", "葡萄牙文", "西班牙文", "越南文"],
+          "default": "英文",
+          "description": "目标语言"
+        },
           "translate.select": {
             "type": "string",
             "enum": ["selected", "row"],
             "default": "selected",
             "description": "内容抓取方式"
           },
-          "translate.youdao.appKey": {
+          "translate.appKey": {
               "type": "string",
-              "default": "135af7f123741651",
+              "default": "",
               "description": "有道翻译appKey"
           },
-          "translate.youdao.appSecret": {
+          "translate.appSecret": {
               "type": "string",
-              "default": "3qElbjXX1P8o5drSPoF17db4Y1LKWhH3",
+              "default": "",
               "description": "有道翻译appSecret"
           }
       }
@@ -63,7 +75,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "build":"vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.93.0",
