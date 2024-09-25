@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "i18n-auto.helloWorld",
-        "title": "Hello World"
+        "command": "i18n-auto.helloWorld1",
+        "title": "Hello World1"
       }
     ]
   },
