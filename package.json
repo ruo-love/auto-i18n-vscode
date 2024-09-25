@@ -14,10 +14,45 @@
   "contributes": {
     "commands": [
       {
-        "command": "i18n-auto.helloWorld1",
+        "command": "i18n-auto.translate",
         "title": "Hello World1"
       }
-    ]
+    ],
+    "keybindings":{
+      "command": "i18n-auto.translate",
+      "key": "Ctrl+2"
+    },
+    "menus": {
+        "editor/context": [
+            {
+                "command": "extension.translate",
+                "when": "editorTextFocus",
+                "group": "i18n-auto"
+            }
+        ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "translate configuration",
+      "properties": {
+          "translate.select": {
+            "type": "string",
+            "enum": ["selected", "row"],
+            "default": "selected",
+            "description": "内容抓取方式"
+          },
+          "translate.youdao.appKey": {
+              "type": "string",
+              "default": "135af7f123741651",
+              "description": "有道翻译appKey"
+          },
+          "translate.youdao.appSecret": {
+              "type": "string",
+              "default": "3qElbjXX1P8o5drSPoF17db4Y1LKWhH3",
+              "description": "有道翻译appSecret"
+          }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",

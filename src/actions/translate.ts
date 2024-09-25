@@ -23,9 +23,9 @@ class TextFilter {
 export class Translate {
   public static API_URL = "http://openapi.youdao.com/api?";
   public static r1: string = "";
-  out: vscode.OutputChannel;
-  appKey: string = "135af7f123741651";
-  appSecret: string = "3qElbjXX1P8o5drSPoF17db4Y1LKWhH3";
+  out: vscode.OutputChannel;  
+  appKey: string = "";
+  appSecret: string = "";
 
   constructor(out: vscode.OutputChannel) {
     this.out = out;
@@ -97,108 +97,128 @@ export class Translate {
     return a;
   }
 
-  fy(q: string) {
-    Translate.ReqData.q = TextFilter.filter(q);
-    Translate.ReqData.salt = this.guid();
-    Translate.ReqData.appKey = this.appKey;
-    this.sign(Translate.ReqData, this.appSecret);
-    let reqUrl = Translate.API_URL + querystring.stringify(Translate.ReqData);
-    //console.log(reqUrl)
-    http
-      .get(reqUrl, (res) => {
-        const { statusCode } = res;
-        const contentType = res.headers["content-type"];
-
-        let error;
-        if (statusCode !== 200) {
-          error = new Error("请求失败。\n" + `状态码: ${statusCode}`);
-        } else if (
-          contentType === undefined ||
-          !/^application\/json/.test(contentType)
-        ) {
-          error = new Error(
-            "无效的 content-type.\n" +
-              `期望 application/json 但获取的是 ${contentType}`
-          );
-        }
-        if (error) {
-          console.error(error.message);
-          vscode.window.showErrorMessage(`错误: ${error.message}`);
-          // 消耗响应数据以释放内存
-          res.resume();
-          return;
-        }
-
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            const parsedData: {
-              errorCode: string;
-              errorMsg: string;
-              translation: string;
-              web: Array<any>;
-            } = JSON.parse(rawData);
-            if (parsedData.errorCode !== "0") {
-              let msg = Translate.ErrorCode[parsedData.errorCode];
-              parsedData.errorMsg = msg !== undefined ? msg : "";
-              vscode.window.showErrorMessage(parsedData.errorMsg);
-            } else {
-              let showMsg: string = "";
-              showMsg += "原    文: " + Translate.ReqData.q;
-              showMsg += "\n翻译结果: " + parsedData.translation;
-              showMsg += "\n词    义: ";
-              for (let v in parsedData.web) {
-                showMsg +=
-                  "\n    " +
-                  parsedData.web[v].key +
-                  ": " +
-                  parsedData.web[v].value;
-              }
-              vscode.env.clipboard
-                .writeText(parsedData.translation[0])
-                .then(() => {
-                  vscode.window.showInformationMessage(
-                    "Text copied to clipboard!"
-                  );
-                });
-              this.out.clear();
-              this.out.appendLine(showMsg);
-
-              // vscode.window.showInformationMessage(showMsg)
-            }
-          } catch (e:any) {
-            console.error(e.message);
-            vscode.window.showErrorMessage(e.message);
+  postYouDao(q: string):any {
+    return new Promise((resolve,reject)=>{
+      Translate.ReqData.q = TextFilter.filter(q);
+      Translate.ReqData.salt = this.guid();
+      Translate.ReqData.appKey = this.appKey;
+      this.sign(Translate.ReqData, this.appSecret);
+      let reqUrl = Translate.API_URL + querystring.stringify(Translate.ReqData);
+      http
+        .get(reqUrl, (res) => {
+          const { statusCode } = res;
+          const contentType = res.headers["content-type"];
+          let error;
+          if (statusCode !== 200) {
+            error = new Error("请求失败。\n" + `状态码: ${statusCode}`);
+          } else if (
+            contentType === undefined ||
+            !/^application\/json/.test(contentType)
+          ) {
+            error = new Error(
+              "无效的 content-type.\n" +
+                `期望 application/json 但获取的是 ${contentType}`
+            );
           }
+          if (error) {
+            console.error(error.message);
+            vscode.window.showErrorMessage(`错误: ${error.message}`);
+            // 消耗响应数据以释放内存
+            res.resume();
+            return;
+          }
+  
+          res.setEncoding("utf8");
+          let rawData = "";
+          res.on("data", (chunk) => {
+            rawData += chunk;
+          });
+          res.on("end", () => {
+            try {
+              const parsedData: {
+                errorCode: string;
+                errorMsg: string;
+                translation: string;
+                web: Array<any>;
+              } = JSON.parse(rawData);
+              if (parsedData.errorCode !== "0") {
+                let msg = Translate.ErrorCode[parsedData.errorCode];
+                parsedData.errorMsg = msg !== undefined ? msg : "";
+                vscode.window.showErrorMessage(parsedData.errorMsg);
+              } else {
+                const inputText = Translate.ReqData.q;
+                const outputText = parsedData.translation[0];
+                resolve({inputText,outputText})
+              }
+            } catch (e:any) {
+              reject(e);
+            }
+          });
+        })
+        .on("error", (e) => {
+          console.error(`错误: ${e.message}`);
+          vscode.window.showErrorMessage(`错误: ${e.message}`);
         });
-      })
-      .on("error", (e) => {
-        console.error(`错误: ${e.message}`);
-        vscode.window.showErrorMessage(`错误: ${e.message}`);
-      });
+    });
   }
-
-  translate(): void {
+  /**调用有道翻译 */
+  async translate() {
     let editor = vscode.window.activeTextEditor;
     if (!editor) {
       return;
     }
     let settings = vscode.workspace.getConfiguration();
-    //let settings = vscode.workspace.getConfiguration('cpplint');
     this.appSecret = settings.get("translate.youdao.appSecret", "");
     this.appKey = settings.get("translate.youdao.appKey", "");
     if (this.appSecret && this.appKey) {
-      let selection = editor.selection;
-      let content = editor.document.getText(selection);
+      const content = this.getCentent();
       if (content) {
-        this.fy(content);
+        try{
+          const {inputText,outputText} =await this.postYouDao(content);
+          this.onSuccess(inputText,outputText);
+        }catch(err){
+          this.onFail(err);
+        }
       }
     } else {
       vscode.window.showErrorMessage("需要配置有道翻译 appKey 和 appSecret !");
     }
+  }
+  /**获取待翻译内容 */
+  getCentent():string{
+    let editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return "";
+    }
+    const settings = vscode.workspace.getConfiguration();
+    const way= settings.get("translate.select", "") as any;
+    let content= "";
+    switch(way){
+      case "selected":
+        const selection = editor.selection;
+        content = editor.document.getText(selection);
+        break;
+      case "row":
+        const line = editor.document.lineAt(editor.selection.active.line);
+        content = line.text;
+        break;
+    }
+    return content;
+  }
+  /**翻译成功拦截 */
+  onSuccess(inputText:string,outputText:string){
+    vscode.env.clipboard
+    .writeText(outputText)
+    .then(() => {
+      vscode.window.showInformationMessage(
+        "The translation is complete and the content has entered the clipboard"
+      );
+    });
+  this.out.clear();
+  this.out.appendLine(inputText);
+  this.out.appendLine(outputText);
+  }
+  onFail(e:any){
+    vscode.window.showErrorMessage(e.message);
   }
 }
