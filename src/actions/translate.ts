@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { Youdao } from "../helper/translate-tool";
+import { Baidu, Youdao } from "../helper/translate-tool";
 
 export class Translate {
   private settings: {
@@ -78,20 +78,25 @@ export class Translate {
     return content;
   }
   /**翻译 */
-  private t(content:string) {
-    switch (this.settings.tool) {
-      case "YOU_DAO":
-        Youdao.translate(content, this.settings).then(this.onSuccess, this.onFail);
-        break;
-      case "BAI_DU":
-        Youdao.translate(content, this.settings).then(this.onSuccess, this.onFail);
-        break;
+  private async t(content:string) {
+    try{
+      let res={};
+      switch (this.settings.tool) {
+        case "YOU_DAO":
+          res=  await Youdao.translate(content, this.settings);
+          break;
+        case "BAI_DU":
+          res= await Baidu.translate(content, this.settings);
+          break;
+      }
+      this.onSuccess(res);
+    }catch(err){
+      this.onFail(err);
     }
+  
   }
   /**翻译成功拦截 */
-  private onSuccess({inputText, outputText}:any) {
-    this.out.appendLine(inputText);
-    this.out.appendLine(outputText);
+  private onSuccess({inputText, outputText,response}:any) {
     vscode.env.clipboard
       .writeText(outputText)
       .then(() => {
@@ -99,6 +104,9 @@ export class Translate {
           "Translation success"
         );
       });
+      this.out.clear();
+      this.out.appendLine(inputText);
+      this.out.appendLine(outputText);
   }
   /**翻译失败拦截 */
   private onFail(e: any) {

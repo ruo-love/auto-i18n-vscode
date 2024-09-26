@@ -4,7 +4,7 @@
   "description": "",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -72,7 +72,7 @@
             "有道",
             "百度"
           ],
-          "default": "有道",
+          "default": "百度",
           "description": "选择翻译服务平台"
         },
         "YOU_DAO.appKey": {
