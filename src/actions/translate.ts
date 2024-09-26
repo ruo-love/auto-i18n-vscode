@@ -1,12 +1,7 @@
 "use strict";
 
-import * as http from "http";
 import * as vscode from "vscode";
-import * as crypto from "crypto";
-import * as querystring from "querystring";
 import { Youdao } from "../helper/translate-tool";
-
-
 
 export class Translate {
   private settings: {
@@ -18,12 +13,14 @@ export class Translate {
       appSecret: "",
       appKey: "",
       toLang: "英语",
-      tool: "有道"
+      tool: ""
     };
-  constructor() {
+  private out: vscode.OutputChannel; 
+  constructor(out: vscode.OutputChannel) {
+    this.out = out;  
     this.getConfig();
   }
-  /**调用有道翻译 */
+  /**run */
   async run() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -31,7 +28,7 @@ export class Translate {
     }
     const content = this.getContent();
     if (content) {
-      this.t();
+      this.t(content);
     } else {
       vscode.window.showErrorMessage("翻译内容不能为空");
     }
@@ -46,8 +43,10 @@ export class Translate {
     const toolName = settings.get("translate.tool", "") as keyof typeof this.ToolMap;
     const tool = this.ToolMap[toolName];
     const toLang = settings.get("translate.toLang", '英文');
-    const appSecret = settings.get(`translate.${toolName}.appSecret`, "");
-    const appKey = settings.get(`translate.${toolName}.appKey`, "");
+    const app_secret_path = `${tool}.appSecret`;
+    const app_key_path =`${tool}.appKey`;
+    const appSecret = settings.get(app_secret_path, "");
+    const appKey = settings.get(app_key_path, "");
     const _settings = {
       appSecret,
       appKey,
@@ -55,6 +54,7 @@ export class Translate {
       tool
     };
     this.settings = _settings;
+    return _settings;
   }
   /**获取待翻译内容 */
   private getContent(): string {
@@ -77,19 +77,21 @@ export class Translate {
     }
     return content;
   }
-  private t() {
-    console.log(`${this.settings.tool} 翻译`)
+  /**翻译 */
+  private t(content:string) {
     switch (this.settings.tool) {
       case "YOU_DAO":
-        Youdao.translate(this.getContent(), this.settings).then(this.onSuccess, this.onFail);
+        Youdao.translate(content, this.settings).then(this.onSuccess, this.onFail);
         break;
       case "BAI_DU":
-        Youdao.translate(this.getContent(), this.settings).then(this.onSuccess, this.onFail);
+        Youdao.translate(content, this.settings).then(this.onSuccess, this.onFail);
         break;
     }
   }
   /**翻译成功拦截 */
-  private onSuccess(inputText: string, outputText: string) {
+  private onSuccess({inputText, outputText}:any) {
+    this.out.appendLine(inputText);
+    this.out.appendLine(outputText);
     vscode.env.clipboard
       .writeText(outputText)
       .then(() => {
@@ -97,9 +99,6 @@ export class Translate {
           "Translation success"
         );
       });
-    this.out.clear();
-    this.out.appendLine(inputText);
-    this.out.appendLine(outputText);
   }
   /**翻译失败拦截 */
   private onFail(e: any) {
