@@ -36,16 +36,23 @@ export class Translate {
       vscode.window.showErrorMessage("翻译内容不能为空");
     }
   }
+  private ToolMap = {
+    "有道": "YOU_DAO",
+    "百度": "BAI_DU"
+  };
   /**获取settings */
   private getConfig() {
     const settings = vscode.workspace.getConfiguration();
-    const appSecret = settings.get("translate.appSecret", "");
-    const appKey = settings.get("translate.appKey", "");
+    const toolName = settings.get("translate.tool", "") as keyof typeof this.ToolMap;
+    const tool = this.ToolMap[toolName];
     const toLang = settings.get("translate.toLang", '英文');
+    const appSecret = settings.get(`translate.${toolName}.appSecret`, "");
+    const appKey = settings.get(`translate.${toolName}.appKey`, "");
     const _settings = {
       appSecret,
       appKey,
-      toLang
+      toLang,
+      tool
     };
     this.settings = _settings;
   }
@@ -73,10 +80,10 @@ export class Translate {
   private t() {
     console.log(`${this.settings.tool} 翻译`)
     switch (this.settings.tool) {
-      case "有道":
+      case "YOU_DAO":
         Youdao.translate(this.getContent(), this.settings).then(this.onSuccess, this.onFail);
         break;
-      case "百度":
+      case "BAI_DU":
         Youdao.translate(this.getContent(), this.settings).then(this.onSuccess, this.onFail);
         break;
     }

@@ -75,15 +75,25 @@
           "default": "有道",
           "description": "选择翻译服务平台"
         },
-        "translate.appKey": {
+        "translate.youdao.appKey": {
           "type": "string",
-          "default": "",
+          "default": "NjeTPKD8wMidwDNSE4zr",
           "description": "有道翻译appKey"
         },
-        "translate.appSecret": {
+        "translate.youdao.appSecret": {
           "type": "string",
-          "default": "",
+          "default": "3qElbjXX1P8o5drSPoF17db4Y1LKWhH3",
           "description": "有道翻译appSecret"
+        },
+        "translate.baidu.appKey": {
+          "type": "string",
+          "default": "20240924002159392",
+          "description": "百度翻译appKey"
+        },
+        "translate.baidu.appSecret": {
+          "type": "string",
+          "default": "NjeTPKD8wMidwDNSE4zr",
+          "description": "百度翻译appSecret"
         }
       }
     }
