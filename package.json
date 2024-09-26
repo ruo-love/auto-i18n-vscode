@@ -4,7 +4,7 @@
   "description": "",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -54,7 +54,7 @@
             "西班牙文",
             "越南文"
           ],
-          "default": "日文",
+          "default": "英文",
           "description": "目标语言"
         },
         "translate.select": {
