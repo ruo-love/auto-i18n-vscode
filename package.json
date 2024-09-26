@@ -24,17 +24,17 @@
         "title": "i18n-auto"
       }
     ],
-    "keybindings":{
+    "keybindings": {
       "command": "i18n-auto.translate",
       "key": "Ctrl+2"
     },
     "menus": {
-        "editor/context": [
-            {
-                "command": "i18n-auto.translate",
-                "when": "editorTextFocus"
-            }
-        ]
+      "editor/context": [
+        {
+          "command": "i18n-auto.translate",
+          "when": "editorTextFocus"
+        }
+      ]
     },
     "icon": "icon.png",
     "configuration": {
@@ -43,26 +43,39 @@
       "properties": {
         "translate.toLang": {
           "type": "string",
-          "enum": ["中文", "日文", "英文", "韩文", "法文", "俄文", "葡萄牙文", "西班牙文", "越南文"],
+          "enum": [
+            "中文",
+            "日文",
+            "英文",
+            "韩文",
+            "法文",
+            "俄文",
+            "葡萄牙文",
+            "西班牙文",
+            "越南文"
+          ],
           "default": "英文",
           "description": "目标语言"
         },
-          "translate.select": {
-            "type": "string",
-            "enum": ["selected", "row"],
-            "default": "selected",
-            "description": "内容抓取方式"
-          },
-          "translate.appKey": {
-              "type": "string",
-              "default": "",
-              "description": "有道翻译appKey"
-          },
-          "translate.appSecret": {
-              "type": "string",
-              "default": "",
-              "description": "有道翻译appSecret"
-          }
+        "translate.select": {
+          "type": "string",
+          "enum": [
+            "selected",
+            "row"
+          ],
+          "default": "selected",
+          "description": "内容抓取方式"
+        },
+        "translate.appKey": {
+          "type": "string",
+          "default": "",
+          "description": "有道翻译appKey"
+        },
+        "translate.appSecret": {
+          "type": "string",
+          "default": "",
+          "description": "有道翻译appSecret"
+        }
       }
     }
   },
@@ -76,20 +89,23 @@
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "build":"vsce package"
+    "build": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "eslint": "^9.9.1",
-    "typescript": "^5.5.4",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.9.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.7"
   }
 }
