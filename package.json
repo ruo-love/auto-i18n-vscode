@@ -66,6 +66,15 @@
           "default": "selected",
           "description": "内容抓取方式"
         },
+        "translate.tool": {
+          "type": "string",
+          "enum": [
+            "有道",
+            "百度"
+          ],
+          "default": "有道",
+          "description": "选择翻译服务平台"
+        },
         "translate.appKey": {
           "type": "string",
           "default": "",
@@ -106,6 +115,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "axios": "^1.7.7"
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.7.7",
+    "uuid": "^10.0.0"
   }
 }
