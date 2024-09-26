@@ -8,7 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
 			outputChannel=vscode.window.createOutputChannel("i18n-auto");
 			outputChannel.show();
 		}
-		new Translate(outputChannel).translate();
+		const translate =new Translate(outputChannel);
+		translate.run();
 	});
 	context.subscriptions.push(disposable);
 }

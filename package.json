@@ -4,7 +4,7 @@
   "description": "",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -63,18 +63,37 @@
             "selected",
             "row"
           ],
-          "default": "selected",
+          "default": "row",
           "description": "内容抓取方式"
         },
-        "translate.appKey": {
+        "translate.tool": {
           "type": "string",
-          "default": "",
+          "enum": [
+            "有道",
+            "百度"
+          ],
+          "default": "百度",
+          "description": "选择翻译服务平台"
+        },
+        "YOU_DAO.appKey": {
+          "type": "string",
+          "default": "135af7f123741651",
           "description": "有道翻译appKey"
         },
-        "translate.appSecret": {
+        "YOU_DAO.appSecret": {
           "type": "string",
-          "default": "",
+          "default": "3qElbjXX1P8o5drSPoF17db4Y1LKWhH3",
           "description": "有道翻译appSecret"
+        },
+        "BAI_DU.appKey": {
+          "type": "string",
+          "default": "20240924002159392",
+          "description": "百度翻译appKey"
+        },
+        "BAI_DU.appSecret": {
+          "type": "string",
+          "default": "NjeTPKD8wMidwDNSE4zr",
+          "description": "百度翻译appSecret"
         }
       }
     }
@@ -106,6 +125,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "axios": "^1.7.7"
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.7.7",
+    "uuid": "^10.0.0"
   }
 }
