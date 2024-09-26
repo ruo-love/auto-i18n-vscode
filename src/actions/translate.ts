@@ -75,7 +75,7 @@ export class Translate {
         content = line.text;
         break;
     }
-    return content;
+    return content.trim();
   }
   /**翻译 */
   private async t(content:string) {

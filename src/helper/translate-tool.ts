@@ -22,7 +22,7 @@ export class Youdao {
         });
         const params = {
             q,
-            from: Youdao.Lang["中文"],
+            from: "auto",
             to,
             appKey,
             salt,
@@ -154,29 +154,33 @@ class TextFilter {
 
 export class Baidu {
     static async translate(question: string, config: { appKey: string; appSecret: string; toLang: string }) {
-    const appKey = config.appKey;
-    const appSecret = config.appSecret;
-    const to = Baidu.Lang[config.toLang];
-    const q = question;
-    const salt = uuidv4();
-    const sign = this.sign({
-        appKey,
-        appSecret,
-        q,
-        salt
-    });
-    const params = {
-        q,
-        from: Baidu.Lang["中文"],
-        to,
-        appid:appKey,
-        salt,
-        sign,
-    };
+        const appKey = config.appKey;
+        const appSecret = config.appSecret;
+        const to = Baidu.Lang[config.toLang];
+        const q = question;
+        const salt = uuidv4();
+        const sign = this.sign({
+            appKey,
+            appSecret,
+            q,
+            salt
+        });
+        const params = {
+            q,
+            from: "auto",
+            to,
+            appid: appKey,
+            salt,
+            sign,
+        };
         try {
             const response = await axios.get(this.API_URL, { params: params });
-            return {inputText:q,outputText:response.data.trans_result[0].dst};
-        } catch (error) {
+            if(response.data.error_code){
+                vscode.window.showErrorMessage(this.ErrorCode[response.data.error_code]);
+                return Promise.reject(response.data.error_code);
+            }
+            return { inputText: q, outputText: response.data.trans_result[0].dst };
+        } catch (error:any) {
             console.error(error);
             return '翻译时出错';
         }
@@ -194,16 +198,33 @@ export class Baidu {
         const signStr = appKey + q + salt + appSecret;
         return this.md5(signStr);
     }
-    private static API_URL ='http://api.fanyi.baidu.com/api/trans/vip/translate';
+    private static API_URL = 'http://api.fanyi.baidu.com/api/trans/vip/translate';
     private static Lang: { [key: string]: string } = {
         "中文": "zh",
-        "日文": "ja",
+        "日文": "jp",
         "英文": "en",
-        "韩文": "ko",
-        "法文": "fr",
+        "韩文": "kor",
+        "法文": "fra",
         "俄文": "ru",
         "葡萄牙文": "pt",
-        "西班牙文": "es",
-        "越南文": "vi"
+        "西班牙文": "spa",
+        "越南文": "vie"
     };
+    private static ErrorCode:any= {
+        52000: "成功",
+        52001: "请求超时：检查请求query是否超长，以及原文或译文参数是否在支持的语种列表里",
+        52002: "系统错误：请重试",
+        52003: "未授权用户：请检查appid是否正确或者服务是否开通",
+        54000: "必填参数为空：请检查是否少传参数",
+        54001: "签名错误：请检查您的签名生成方法",
+        54003: "访问频率受限：请降低您的调用频率，或在控制台进行身份认证后切换为高级版/尊享版",
+        54004: "账户余额不足：请前往管理控制台为账户充值",
+        54005: "长query请求频繁：请降低长query的发送频率，3s后再试",
+        58000: "客户端IP非法：检查个人资料里填写的IP地址是否正确，可前往开发者信息-基本信息修改",
+        58001: "译文语言方向不支持：检查译文语言是否在语言列表里",
+        58002: "服务当前已关闭：请前往管理控制台开启服务",
+        58003: "此IP已被封禁：同一IP当日使用多个APPID发送翻译请求，则该IP将被封禁当日请求权限，次日解封。请勿将APPID和密钥填写到第三方软件中。",
+        90107: "认证未通过或未生效：请前往我的认证查看认证进度",
+        20003: "请求内容存在安全风险"
+    }
 }

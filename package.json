@@ -54,7 +54,7 @@
             "西班牙文",
             "越南文"
           ],
-          "default": "英文",
+          "default": "日文",
           "description": "目标语言"
         },
         "translate.select": {
