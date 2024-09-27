@@ -28,7 +28,7 @@ export class Translate {
     }
     const content = this.getContent();
     if (content) {
-      this.t(content);
+      this.translate(content);
     } else {
       vscode.window.showErrorMessage("翻译内容不能为空");
     }
@@ -78,7 +78,7 @@ export class Translate {
     return content.trim();
   }
   /**翻译 */
-  private async t(content:string) {
+  private async translate(content:string) {
     try{
       let res={};
       switch (this.settings.tool) {
