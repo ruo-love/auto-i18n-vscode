@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { Baidu, Youdao } from "../helper/translate-tool";
 
 export class Translate {
+  private way:string;
   private settings: {
     appSecret: string,
     appKey: string,
@@ -16,8 +17,9 @@ export class Translate {
       tool: ""
     };
   private out: vscode.OutputChannel; 
-  constructor(out: vscode.OutputChannel) {
-    this.out = out;  
+  constructor(out: vscode.OutputChannel, way:'row'|'selected') {
+    this.out = out;
+    this.way = way;
     this.getConfig();
   }
   /**run */
@@ -62,10 +64,8 @@ export class Translate {
     if (!editor) {
       return "";
     }
-    const settings = vscode.workspace.getConfiguration();
-    const way = settings.get("translate.select", "") as any;
     let content = "";
-    switch (way) {
+    switch (this.way) {
       case "selected":
         const selection = editor.selection;
         content = editor.document.getText(selection);

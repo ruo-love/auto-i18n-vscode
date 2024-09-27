@@ -1,16 +1,25 @@
 import * as vscode from 'vscode';
 import { Translate } from './actions/translate';
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "i18n-auto" is now active!');
+	console.log('Congratulations, your extension "Quick Translation" is now active!');
 	let outputChannel:vscode.OutputChannel;
-	const disposable = vscode.commands.registerCommand('i18n-auto.translate', () => {
+	const translateRow = vscode.commands.registerCommand('quick-translation.translate.row', () => {
 		if(!outputChannel){
-			outputChannel=vscode.window.createOutputChannel("i18n-auto");
+			outputChannel=vscode.window.createOutputChannel("quick-translation");
 			outputChannel.show();
 		}
-		const translate =new Translate(outputChannel);
+		const translate =new Translate(outputChannel, 'row');
 		translate.run();
 	});
-	context.subscriptions.push(disposable);
+	const translateSelected = vscode.commands.registerCommand('quick-translation.translate.selected', () => {
+		if(!outputChannel){
+			outputChannel=vscode.window.createOutputChannel("quick-translation");
+			outputChannel.show();
+		}
+		const translate =new Translate(outputChannel, 'selected');
+		translate.run();
+	});
+	context.subscriptions.push(translateRow);
+	context.subscriptions.push(translateSelected);
 }
 export function deactivate() {}
