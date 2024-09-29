@@ -9,12 +9,14 @@ export class Translate {
     appSecret: string,
     appKey: string,
     toLang: string,
-    tool: string
+    tool: string,
+    copy: string
   } = {
       appSecret: "",
       appKey: "",
       toLang: "英语",
-      tool: ""
+      tool: "",
+      copy: ""
     };
   private out: vscode.OutputChannel; 
   constructor(out: vscode.OutputChannel, way:'row'|'selected') {
@@ -42,18 +44,20 @@ export class Translate {
   /**获取settings */
   private getConfig() {
     const settings = vscode.workspace.getConfiguration();
-    const toolName = settings.get("translate.tool", "") as keyof typeof this.ToolMap;
+    const copy = settings.get("quick-translation.translate.copy", 'open');
+    const toolName = settings.get("quick-translation.translate.tool", "") as keyof typeof this.ToolMap;
     const tool = this.ToolMap[toolName];
-    const toLang = settings.get("translate.toLang", '英文');
-    const app_secret_path = `${tool}.appSecret`;
-    const app_key_path =`${tool}.appKey`;
+    const toLang = settings.get("quick-translation.translate.toLang", '英文');
+    const app_secret_path = `quick-translation.${tool}.appSecret`;
+    const app_key_path =`quick-translation.${tool}.appKey`;
     const appSecret = settings.get(app_secret_path, "");
     const appKey = settings.get(app_key_path, "");
     const _settings = {
       appSecret,
       appKey,
       toLang,
-      tool
+      tool,
+      copy
     };
     this.settings = _settings;
     return _settings;
@@ -81,6 +85,7 @@ export class Translate {
   private async translate(content:string) {
     try{
       let res={};
+   
       switch (this.settings.tool) {
         case "YOU_DAO":
           res=  await Youdao.translate(content, this.settings);
@@ -97,16 +102,18 @@ export class Translate {
   }
   /**翻译成功拦截 */
   private onSuccess({inputText, outputText,response}:any) {
-    vscode.env.clipboard
+    if(this.settings.copy==='open'){
+      vscode.env.clipboard
       .writeText(outputText)
       .then(() => {
         vscode.window.showInformationMessage(
           "Translation success"
         );
       });
-      this.out.clear();
-      this.out.appendLine(inputText);
-      this.out.appendLine(outputText);
+    }
+    this.out.clear();
+    this.out.appendLine(inputText);
+    this.out.appendLine(outputText);
   }
   /**翻译失败拦截 */
   private onFail(e: any) {
