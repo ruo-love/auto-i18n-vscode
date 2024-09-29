@@ -4,7 +4,7 @@
   "description": "快捷翻译文本并复制到剪贴板",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "engines": {
     "vscode": "^1.75.1"
   },
@@ -68,7 +68,7 @@
             "西班牙文",
             "越南文"
           ],
-          "default": "中文",
+          "default": "英文",
           "description": "目标语言"
         },
         "quick-translation.translate.copy": {
@@ -77,7 +77,7 @@
             "open",
             "close"
           ],
-          "default": "close",
+          "default": "open",
           "description": "翻译后是否复制结果到剪贴板"
         },
         "quick-translation.translate.tool": {
