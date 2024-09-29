@@ -4,7 +4,7 @@
   "description": "快捷翻译文本并复制到剪贴板",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "engines": {
     "vscode": "^1.75.1"
   },
