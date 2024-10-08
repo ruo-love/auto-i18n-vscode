@@ -174,6 +174,7 @@ export class Baidu {
             sign,
         };
         try {
+            vscode.window.showInformationMessage(JSON.stringify(params));
             const response = await axios.get(this.API_URL, { params: params });
             if(response.data.error_code){
                 vscode.window.showErrorMessage(this.ErrorCode[response.data.error_code]);

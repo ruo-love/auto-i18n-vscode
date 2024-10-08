@@ -4,7 +4,7 @@
   "description": "快捷翻译文本并复制到剪贴板",
   "author": "ruo-love",
   "publisher": "ruo-love",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "engines": {
     "vscode": "^1.75.1"
   },
@@ -86,7 +86,7 @@
             "有道",
             "百度"
           ],
-          "default": "百度",
+          "default": "有道",
           "description": "选择翻译服务平台"
         },
         "quick-translation.YOU_DAO.appKey": {
